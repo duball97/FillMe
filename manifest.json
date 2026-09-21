@@ -1,0 +1,23 @@
+{
+  "manifest_version": 3,
+  "name": "FillMe",
+  "version": "0.1.0",
+  "description": "A private, local-first form profile that fills repetitive forms in one click.",
+  "permissions": ["storage", "activeTab", "scripting"],
+  "host_permissions": ["http://localhost:8787/*", "http://127.0.0.1:8787/*"],
+  "action": {
+    "default_title": "Fillflow",
+    "default_popup": "popup.html"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "options_page": "popup.html"
+}

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Fillflow</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div class="brand"><span class="brand-mark">✦</span><span>FillMe</span></div>
+        <span class="privacy"><span class="dot"></span> profile local</span>
+      </header>
+
+      <section class="hero">
+        <p class="eyebrow">YOUR PERSONAL AUTOFILL</p>
+        <h1>Forms, meet<br /><em>done.</em></h1>
+        <p class="lede">Keep your details once. Fill them everywhere with a single click.</p>
+      </section>
+
+      <section class="action-card">
+        <div>
+          <span class="card-kicker">READY ON THIS PAGE</span>
+          <strong id="field-count">Looking for fields…</strong>
+        </div>
+        <div class="button-stack"><button id="fill-button" class="primary">Fill this form <span>↗</span></button><button id="answer-button" class="secondary">Answer with AI <span>✦</span></button></div>
+        <p id="status" class="status" role="status"></p>
+      </section>
+
+      <section class="ai-section">
+        <div class="section-heading"><div><span class="card-kicker">AI ANSWERS</span><h2>Let AI draft the tricky bits.</h2></div><span class="saved-count">optional</span></div>
+        <p class="ai-copy">The extension talks to your local FillMe server. That server reads your provider key from <code>.env</code>; the key never enters Chrome.</p>
+        <form id="settings-form">
+          <label>AI provider<select name="provider"><option value="openai">OpenAI / ChatGPT</option><option value="openrouter">OpenRouter</option></select></label>
+          <label>Model<input name="aiModel" placeholder="gpt-5.6-luna" /></label>
+          <button class="save" type="submit">Save AI settings <span>✓</span></button>
+        </form>
+      </section>
+
+      <section class="profile-section">
+        <div class="section-heading">
+          <div><span class="card-kicker">YOUR PROFILE</span><h2>The details you want on hand.</h2></div>
+          <span id="saved-count" class="saved-count">0 saved</span>
+        </div>
+        <form id="profile-form" autocomplete="off">
+          <div class="grid two">
+            <label>First name<input name="firstName" placeholder="Ada" /></label>
+            <label>Last name<input name="lastName" placeholder="Lovelace" /></label>
+          </div>
+          <label>Email<input name="email" type="email" placeholder="ada@example.com" /></label>
+          <div class="grid two">
+            <label>Phone<input name="phone" type="tel" placeholder="+351 900 000 000" /></label>
+            <label>Company<input name="company" placeholder="Your company" /></label>
+          </div>
+          <label>Address<input name="address" placeholder="10 Downing Street" /></label>
+          <div class="grid two">
+            <label>City<input name="city" placeholder="London" /></label>
+            <label>Postal code<input name="postalCode" placeholder="SW1A 2AA" /></label>
+          </div>
+          <button class="save" type="submit">Save profile <span>✓</span></button>
+        </form>
+      </section>
+
+      <button id="learn-button" class="text-button">↳ Learn from the form on this page</button>
+      <p class="fine-print">Autofill stays local. AI answers are opt-in and send the selected page questions plus profile context to OpenAI.</p>
+    </main>
+    <script src="popup.js"></script>
+  </body>
+</html>

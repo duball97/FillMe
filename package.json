@@ -1,0 +1,8 @@
+{
+  "name": "fillme-extension",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "server": "node server.js"
+  }
+}
