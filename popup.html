@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Fillflow</title>
+    <title>FillMe</title>
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
@@ -28,17 +28,68 @@
         <p id="status" class="status" role="status"></p>
       </section>
 
-      <section class="ai-section">
+      <details class="ai-section collapsible">
+        <summary><span>AI ANSWERS</span><small>optional</small></summary>
         <div class="section-heading"><div><span class="card-kicker">AI ANSWERS</span><h2>Let AI draft the tricky bits.</h2></div><span class="saved-count">optional</span></div>
-        <p class="ai-copy">The extension talks to your local FillMe server. That server reads your provider key from <code>.env</code>; the key never enters Chrome.</p>
+        <p class="ai-copy">Choose your own provider key or use FillMe AI. Personal keys stay in this browser; FillMe AI uses our server-side OpenRouter connection.</p>
         <form id="settings-form">
-          <label>AI provider<select name="provider"><option value="openai">OpenAI / ChatGPT</option><option value="openrouter">OpenRouter</option></select></label>
-          <label>Model<input name="aiModel" placeholder="gpt-5.6-luna" /></label>
+          <label>AI access <span class="mode-caption">choose one</span><select id="mode" name="mode"><option value="fillme-openrouter">Use FillMe AI (OpenRouter)</option><option value="openai-key">Use my OpenAI API key</option><option value="openrouter-key">Use my OpenRouter API key</option></select></label>
+          <label id="api-key-row"><span id="api-key-label">Your provider API key</span><input name="aiApiKey" type="password" placeholder="key…" /></label>
+          <label>Model<input name="aiModel" placeholder="~typesafe/jev-latest" /></label>
+          <p id="mode-help" class="mode-help"></p>
+          <div class="memory-row"><span id="answer-memory-status">0 learned answers</span><button id="clear-answer-memory" class="text-button" type="button">Clear</button></div>
           <button class="save" type="submit">Save AI settings <span>✓</span></button>
         </form>
-      </section>
+      </details>
 
-      <section class="profile-section">
+      <details class="vault-section collapsible">
+        <summary><span>PRIVATE VAULT</span><small>passwords + cards</small></summary>
+        <div class="section-heading"><div><span class="card-kicker">PRIVATE VAULT</span><h2>Only you can unlock these.</h2></div><span id="vault-state" class="saved-count">locked</span></div>
+        <p class="vault-copy">Passwords and card details are encrypted locally. They never enter AI requests. Add the website where an entry belongs; the current site is filled automatically. FillMe can use them only after you unlock the vault and click Fill Me.</p>
+        <div id="vault-locked">
+          <label>Vault password<input id="vault-password" type="password" placeholder="Never stored" /></label>
+          <button id="vault-action" class="save" type="button">Create private vault <span>⌁</span></button>
+          <p id="vault-status" class="mode-help"></p>
+        </div>
+        <div id="pending-login" class="pending-login" hidden></div>
+        <div id="vault-unlocked" hidden>
+          <form id="vault-entry-form">
+            <div class="grid two"><label>Entry name<input name="name" placeholder="Personal login" required /></label><label>Type<select name="kind"><option value="login">Login</option><option value="card">Card</option></select></label></div>
+            <label>Website<input name="website" type="url" placeholder="https://example.com" /></label>
+            <div id="login-fields"><label>Username or email<input name="username" autocomplete="off" /></label><label>Password<input name="password" type="password" autocomplete="new-password" /></label></div>
+            <div id="card-fields" hidden><label>Cardholder name<input name="cardholderName" autocomplete="off" /></label><label>Card number<input name="cardNumber" inputmode="numeric" autocomplete="off" /></label><div class="grid two"><label>Expiry<input name="expiry" placeholder="MM/YY" autocomplete="off" /></label><label>Security code<input name="cvc" type="password" autocomplete="off" /></label></div></div>
+            <button class="save" type="submit">Save encrypted entry <span>✓</span></button>
+          </form>
+          <div id="vault-entries" class="vault-entries"></div>
+          <button id="vault-lock" class="text-button" type="button">Lock private vault</button>
+          <p id="vault-unlocked-status" class="mode-help"></p>
+        </div>
+      </details>
+
+      <details class="document-section collapsible">
+        <summary><span>DOCUMENTS</span><small>encrypted files + extraction</small></summary>
+        <div class="section-heading"><div><span class="card-kicker">PRIVATE DOCUMENTS</span><h2>Keep ID details ready.</h2></div><span class="saved-count">local vault</span></div>
+        <p class="vault-copy">Add the front and back of a document. AI extraction happens only when you click the button, and you review the fields before saving.</p>
+        <form id="document-form" autocomplete="off">
+          <label>Document type<select name="documentType"><option value="Cartão de Cidadão">Cartão de Cidadão</option><option value="Passport">Passport</option><option value="Residence permit">Residence permit</option><option value="Driver license">Driver license</option><option value="Other">Other</option></select></label>
+          <div class="grid two"><label>Front image<input id="document-front" type="file" accept="image/*" /></label><label>Back image<input id="document-back" type="file" accept="image/*" /></label></div>
+          <button id="extract-document" class="secondary" type="button">Extract with AI ✦</button>
+          <label>Full name<input name="fullName" autocomplete="off" /></label>
+          <div class="grid two"><label>Document number<input name="documentNumber" autocomplete="off" /></label><label>Support number<input name="supportNumber" autocomplete="off" /></label></div>
+          <div class="grid two"><label>Issue date<input name="issueDate" type="date" /></label><label>Expiry date<input name="expiryDate" type="date" /></label></div>
+          <div class="grid two"><label>NIF / tax number<input name="nif" autocomplete="off" /></label><label>Social security number<input name="socialSecurityNumber" autocomplete="off" /></label></div>
+          <div class="grid two"><label>Health number / SNS<input name="healthNumber" autocomplete="off" /></label><label>Birth date<input name="birthDate" type="date" /></label></div>
+          <label>Issuing country<input name="issueCountry" autocomplete="off" placeholder="Portugal" /></label>
+          <div id="document-extra-fields" class="custom-fields"></div>
+          <button id="add-document-field" class="text-button custom-field-add" type="button">+ Add another extracted field</button>
+          <button id="save-document" class="save" type="submit">Save encrypted document ✓</button>
+          <p id="document-status" class="mode-help"></p>
+        </form>
+        <div id="document-entries" class="vault-entries"></div>
+      </details>
+
+      <details class="profile-section collapsible">
+        <summary><span>YOUR PROFILE</span><small>personal details</small></summary>
         <div class="section-heading">
           <div><span class="card-kicker">YOUR PROFILE</span><h2>The details you want on hand.</h2></div>
           <span id="saved-count" class="saved-count">0 saved</span>
@@ -48,23 +99,52 @@
             <label>First name<input name="firstName" placeholder="Ada" /></label>
             <label>Last name<input name="lastName" placeholder="Lovelace" /></label>
           </div>
+          <div class="grid two">
+            <label>Middle name<input name="middleName" placeholder="Byron" /></label>
+            <label>Preferred name<input name="preferredName" placeholder="Ada" /></label>
+          </div>
           <label>Email<input name="email" type="email" placeholder="ada@example.com" /></label>
           <div class="grid two">
             <label>Phone<input name="phone" type="tel" placeholder="+351 900 000 000" /></label>
             <label>Company<input name="company" placeholder="Your company" /></label>
           </div>
+          <div class="grid two">
+            <label>Job title<input name="jobTitle" placeholder="Product designer" /></label>
+            <label>Website<input name="website" type="url" placeholder="https://example.com" /></label>
+          </div>
           <label>Address<input name="address" placeholder="10 Downing Street" /></label>
+          <label>Address line 2<input name="addressLine2" placeholder="Apartment, suite, floor" /></label>
           <div class="grid two">
             <label>City<input name="city" placeholder="London" /></label>
-            <label>Postal code<input name="postalCode" placeholder="SW1A 2AA" /></label>
+            <label>State / province<input name="state" placeholder="Lisbon" /></label>
           </div>
+          <div class="grid two">
+            <label>Postal code<input name="postalCode" placeholder="SW1A 2AA" /></label>
+            <label>Country<input name="country" placeholder="Portugal" /></label>
+          </div>
+          <div class="grid two">
+            <label>Date of birth<input name="dateOfBirth" type="date" /></label>
+            <label>Gender<input name="gender" placeholder="Prefer not to say" /></label>
+          </div>
+          <div class="grid two">
+            <label>Nationality<input name="nationality" placeholder="Portuguese" /></label>
+            <label>Document type<input name="documentType" placeholder="Passport" /></label>
+          </div>
+          <label>Document number<input name="documentNumber" placeholder="Optional" /></label>
+          <div class="grid two">
+            <label>Emergency contact<input name="emergencyContactName" placeholder="Name" /></label>
+            <label>Emergency phone<input name="emergencyContactPhone" type="tel" placeholder="Phone" /></label>
+          </div>
+          <div id="custom-fields" class="custom-fields"></div>
+          <button id="add-custom-field" class="text-button custom-field-add" type="button">+ Add another profile field</button>
           <button class="save" type="submit">Save profile <span>✓</span></button>
         </form>
-      </section>
+      </details>
 
       <button id="learn-button" class="text-button">↳ Learn from the form on this page</button>
-      <p class="fine-print">Autofill stays local. AI answers are opt-in and send the selected page questions plus profile context to OpenAI.</p>
+      <p class="fine-print">Profile data stays local. Payment, password, and sensitive ID fields stay out of normal AI answers. Document images are sent only when you click Extract with AI.</p>
     </main>
+    <script src="ai-client.js"></script>
     <script src="popup.js"></script>
   </body>
 </html>
